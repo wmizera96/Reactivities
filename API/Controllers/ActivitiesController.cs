@@ -1,28 +1,27 @@
+using Application.Activities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
-        private readonly DataContext _context;
-
-        public ActivitiesController(DataContext context)
-        {
-            this._context = context;
-        }   
-
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> GetActivities()
         {
-            return await this._context.Activities.ToListAsync(); 
+            return await this.Mediator.Send(new List.Query());
         }
 
-        
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Activity>> GetActivity(Guid id)
         {
-            return await this._context.Activities.FindAsync(id); 
+            return await Mediator.Send(new Details.Query(id));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateActivity(Activity activity)
+        {
+            return Ok(await Mediator.Send(new Create.Command(activity)));
         }
     }
 }
