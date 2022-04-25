@@ -1,17 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using MediatR;
 
 namespace Application.Activities
 {
-    public class Create
+    public class Delete
     {
         public class Command : IRequest
         {
-            public Command(Activity activity)
+            public Guid Id { get; set; }
+            public Command(Guid id)
             {
-                this.Activity = activity;
-            }
+                this.Id = id;
 
-            public Activity Activity { get; set; }
+            }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -21,12 +25,18 @@ namespace Application.Activities
             public Handler(DataContext context)
             {
                 this._context = context;
+
             }
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                this._context.Add(request.Activity);
-                await this._context.SaveChangesAsync();
+                var activity = await this._context.Activities.FindAsync(request.Id);
+
+                if (activity != null)
+                {
+                    this._context.Remove(activity);
+                    await this._context.SaveChangesAsync();
+                }
 
                 return Unit.Value;
             }
