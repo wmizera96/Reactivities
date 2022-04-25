@@ -6,11 +6,10 @@ namespace Application.Activities
     {
         public class Command : IRequest
         {
-            private Activity activity;
 
             public Command(Activity activity)
             {
-                this.activity = activity;
+                this.Activity = activity;
             }
 
             public Activity Activity { get; set; }
@@ -27,7 +26,7 @@ namespace Application.Activities
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                this._context.Activities.Add(request.Activity);
+                this._context.Add(request.Activity);
                 await this._context.SaveChangesAsync();
 
                 return Unit.Value;
