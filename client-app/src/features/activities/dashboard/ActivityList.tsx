@@ -1,16 +1,13 @@
+import { observer } from "mobx-react-lite";
 import React, { FC, SyntheticEvent, useState } from "react";
 import { Button, Item, Label, Segment } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
+import { useStore } from "../../../app/stores/store";
 
-interface Props {
-    activities: Activity[],
-    selectActivity: (id: string) => void,
-    deleteActivity: (id: string) => void;
-    submitting: boolean
-}
 
-export const ActivityList: FC<Props> = ({ activities, selectActivity, deleteActivity, submitting }) => {
-
+const ActivityList: FC = () => {
+    
+    const { selectActivity, deleteActivity, activitiesByDate, loading } = useStore().activityStore;
+    
     const [target, setTarget] = useState('');
 
     const handleActivityDelete = (e: SyntheticEvent<HTMLButtonElement>, id: string) => {
@@ -21,7 +18,7 @@ export const ActivityList: FC<Props> = ({ activities, selectActivity, deleteActi
     return (
         <Segment>
             <Item.Group divided>
-                {activities.map(activity => <Item key={activity.id}>
+                {activitiesByDate.map(activity => <Item key={activity.id}>
                     <Item.Content>
                         <Item.Header as="a">
                             {activity.title}
@@ -33,7 +30,7 @@ export const ActivityList: FC<Props> = ({ activities, selectActivity, deleteActi
                         </Item.Description>
                         <Item.Extra>
                             <Button onClick={() => selectActivity(activity.id)} floated="right" content="View" color="blue" />
-                            <Button name={activity.id} loading={submitting && target === activity.id} onClick={(e) => handleActivityDelete(e, activity.id)} floated="right" content="Delete" color="red" />
+                            <Button name={activity.id} loading={loading && target === activity.id} onClick={(e) => handleActivityDelete(e, activity.id)} floated="right" content="Delete" color="red" />
                             <Label basic content={activity.category} />
                         </Item.Extra>
                     </Item.Content>
@@ -42,3 +39,5 @@ export const ActivityList: FC<Props> = ({ activities, selectActivity, deleteActi
         </Segment>
     )
 }
+
+export default observer(ActivityList);
