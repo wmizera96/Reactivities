@@ -1,8 +1,9 @@
+using Application.Core;
 using MediatR;
 
 public class Details
 {
-    public class Query : IRequest<Activity>
+    public class Query : IRequest<Result<Activity>>
     {
         public Query(Guid id)
         {
@@ -13,7 +14,7 @@ public class Details
     }
 
 
-    public class Handler : IRequestHandler<Query, Activity>
+    public class Handler : IRequestHandler<Query, Result<Activity>>
     {
         private readonly DataContext _context;
 
@@ -22,9 +23,11 @@ public class Details
             this._context = context;
         }
 
-        public async Task<Activity> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Activity>> Handle(Query request, CancellationToken cancellationToken)
         {
-            return await this._context.Activities.FindAsync(request.Id);
+            var activity = await this._context.Activities.FindAsync(request.Id);
+
+            return Result<Activity>.Success(activity);
         }
     }
 }

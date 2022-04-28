@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Core;
 using MediatR;
 
 namespace Application.Activities
 {
     public class Delete
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Guid Id { get; set; }
             public Command(Guid id)
@@ -18,7 +19,7 @@ namespace Application.Activities
             }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext _context;
 
@@ -28,17 +29,21 @@ namespace Application.Activities
 
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var activity = await this._context.Activities.FindAsync(request.Id);
 
-                if (activity != null)
-                {
-                    this._context.Remove(activity);
-                    await this._context.SaveChangesAsync();
-                }
+                if (activity is null)
+                    return null;
 
-                return Unit.Value;
+                this._context.Remove(activity);
+                var result = await this._context.SaveChangesAsync() > 0;
+
+                if (result is false)
+                    return Result<Unit>.Failure("Failed to delete the activity");
+
+
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }

@@ -1,12 +1,13 @@
+using Application.Core;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public class List
 {
-    public class Query : IRequest<List<Activity>> { }
+    public class Query : IRequest<Result<List<Activity>>> { }
 
-    public class Handler : IRequestHandler<Query, List<Activity>>
+    public class Handler : IRequestHandler<Query, Result<List<Activity>>>
     {
         private readonly DataContext _context;
         private readonly ILogger _logger;
@@ -16,7 +17,7 @@ public class List
             this._logger = logger;
 
         }
-        public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<List<Activity>>> Handle(Query request, CancellationToken cancellationToken)
         {
             try
             {
@@ -33,7 +34,7 @@ public class List
                 this._logger.LogInformation("Operation cancelled");
             }
 
-            return await this._context.Activities.ToListAsync(cancellationToken);
+            return Result<List<Activity>>.Success(await this._context.Activities.ToListAsync(cancellationToken));
         }
     }
 }

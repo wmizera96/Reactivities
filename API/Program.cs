@@ -1,5 +1,7 @@
 using API.Extensions;
+using Application.Activities;
 using Application.Core;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddFluentValidation(config => {
+    config.RegisterValidatorsFromAssemblyContaining<Create>();
+});
 builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
