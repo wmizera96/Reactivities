@@ -1,16 +1,20 @@
 import { observer } from "mobx-react-lite";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { FC } from "react";
+import { Link, useHistory, useParams } from "react-router-dom";
 import { Button, Form, Segment } from "semantic-ui-react";
+import { LoadingComponent } from "../../../app/layout/LoadingComponent";
 import { useStore } from "../../../app/stores/store";
+import { v4 as uuid } from "uuid";
 
 
 const ActivityForm: FC = () => {
 
-    const { selectedActivity, closeForm, loading, createActivity, updateActivity } = useStore().activityStore;
+    const { loadActivity, loading, createActivity, updateActivity, loadingInitial, setLoadingInitial } = useStore().activityStore;
 
-
-    const initialState = selectedActivity ?? {
+    const {id} = useParams<{id: string}>();
+    const history = useHistory();
+    const [activity, setActivity] = useState({
         id: "",
         title: "",
         category: "",
@@ -18,16 +22,24 @@ const ActivityForm: FC = () => {
         date: "",
         city: "",
         venue: ""
-    }
+    });
 
 
-    const [activity, setActivity] = useState(initialState);
+    useEffect(() => {
+        if(id){
+            loadActivity(id).then(a => setActivity(a));
+        }else{
+            setLoadingInitial(false)
+        }
+    },[id, loadActivity, setLoadingInitial])
+
 
     const handleSubmit = () => {
-        if(activity.id){
-            updateActivity(activity);
+        if(!!activity.id){
+            updateActivity(activity).then(() => history.push(`/activities/${activity.id}`));
         }else{
-            createActivity(activity);
+            activity.id = uuid()
+            createActivity(activity).then(() => history.push(`/activities/${activity.id}`));
         }
     }
 
@@ -40,6 +52,9 @@ const ActivityForm: FC = () => {
         })
     }
 
+    if(loadingInitial) 
+        return <LoadingComponent content="Loading..."/>
+
     return (
         <Segment clearing>
             <Form onSubmit={handleSubmit} autoComplete="off">
@@ -50,7 +65,7 @@ const ActivityForm: FC = () => {
                 <Form.Input placeholder="City"  value={activity.city} name="city" onChange={handleInputChange} />
                 <Form.Input placeholder="Venue" value={activity.venue} name="venue" onChange={handleInputChange} />
                 <Button loading={loading} floated="right" positive type="submit" content="Submit" />
-                <Button onClick={closeForm} floated="right" type="button" content="Cancel" />
+                <Button as={Link} to="/activities" floated="right" type="button" content="Cancel" />
             </Form>
         </Segment>
     )
