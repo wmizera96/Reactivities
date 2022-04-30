@@ -33,8 +33,8 @@ namespace Application.Activities
             {
                 var activity = await this._context.Activities.FindAsync(request.Id);
 
-                if (activity is null)
-                    return null;
+                // if (activity is null)
+                    // return null;
 
                 this._context.Remove(activity);
                 var result = await this._context.SaveChangesAsync() > 0;
