@@ -43,3 +43,8 @@ body {
 }
 
 /*end home page styles*/
+
+/* This is optional, I think*/
+.react-datepicker-wrapper {
+  width: 100%;
+}
