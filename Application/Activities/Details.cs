@@ -1,9 +1,13 @@
+using Application.Activities;
 using Application.Core;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 public class Details
 {
-    public class Query : IRequest<Result<Activity>>
+    public class Query : IRequest<Result<ActivityDto>>
     {
         public Query(Guid id)
         {
@@ -14,20 +18,24 @@ public class Details
     }
 
 
-    public class Handler : IRequestHandler<Query, Result<Activity>>
+    public class Handler : IRequestHandler<Query, Result<ActivityDto>>
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public Handler(DataContext context)
+        public Handler(DataContext context, IMapper mapper)
         {
+            this._mapper = mapper;
             this._context = context;
         }
 
-        public async Task<Result<Activity>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var activity = await this._context.Activities.FindAsync(request.Id);
+            var activity = await this._context.Activities
+                .ProjectTo<ActivityDto>(this._mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-            return Result<Activity>.Success(activity);
+            return Result<ActivityDto>.Success(activity);
         }
     }
 }

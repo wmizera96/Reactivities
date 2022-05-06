@@ -1,23 +1,28 @@
+using Application.Activities;
 using Application.Core;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public class List
 {
-    public class Query : IRequest<Result<List<Activity>>> { }
+    public class Query : IRequest<Result<List<ActivityDto>>> { }
 
-    public class Handler : IRequestHandler<Query, Result<List<Activity>>>
+    public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
     {
         private readonly DataContext _context;
         private readonly ILogger _logger;
-        public Handler(DataContext context, ILogger<List> logger)
+        private readonly IMapper _mapper;
+        public Handler(DataContext context, ILogger<List> logger, IMapper mapper)
         {
+            this._mapper = mapper;
             this._context = context;
             this._logger = logger;
 
         }
-        public async Task<Result<List<Activity>>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
             try
             {
@@ -34,7 +39,11 @@ public class List
                 this._logger.LogInformation("Operation cancelled");
             }
 
-            return Result<List<Activity>>.Success(await this._context.Activities.ToListAsync(cancellationToken));
+            var activities = await this._context.Activities
+                .ProjectTo<ActivityDto>(this._mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return Result<List<ActivityDto>>.Success(activities);
         }
     }
 }
