@@ -3,7 +3,7 @@ import { makeAutoObservable } from "mobx";
 import { agent } from "../api/agent";
 import { Activity } from "../models/activity";
 
-export class ActivityStore {
+export default class ActivityStore {
     constructor() {
         makeAutoObservable(this);
     }

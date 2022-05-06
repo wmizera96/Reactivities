@@ -6,6 +6,7 @@ namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
+        [AllowAnonymous] // temp
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> GetActivities(CancellationToken ct)
         {

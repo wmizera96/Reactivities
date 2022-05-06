@@ -19,7 +19,7 @@ const ActivityDashboard: FC = () => {
 
 
     if (activityStore.loadingInitial)
-        return <LoadingComponent content='Loading app' />
+        return <LoadingComponent content='Loading activities' />
 
     return (
         <Grid>
