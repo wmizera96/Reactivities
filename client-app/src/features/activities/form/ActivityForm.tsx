@@ -12,24 +12,16 @@ import MyTextArea from "../../../app/common/form/MyTextArea";
 import MySelectInput from "../../../app/common/form/MySelectInput";
 import { categoryOptions } from "../../../app/common/form/options/categoryOptions";
 import MyDateInput from "../../../app/common/MyDateInput";
-import { Activity } from "../../../app/models/activity";
+import { ActivityFormValues } from "../../../app/models/activity";
 import { v4 as uuid } from "uuid";
 
 const ActivityForm: FC = () => {
 
-    const { loadActivity, loading, createActivity, updateActivity, loadingInitial, setLoadingInitial } = useStore().activityStore;
+    const { loadActivity, createActivity, updateActivity, loadingInitial, setLoadingInitial } = useStore().activityStore;
 
     const { id } = useParams<{ id: string }>();
     const history = useHistory();
-    const [activity, setActivity] = useState<Activity>({
-        id: "",
-        title: "",
-        category: "",
-        description: "",
-        date: null,
-        city: "",
-        venue: ""
-    });
+    const [activity, setActivity] = useState<ActivityFormValues>(new ActivityFormValues());
 
 
     const validationSchema = Yup.object({
@@ -43,7 +35,7 @@ const ActivityForm: FC = () => {
 
     useEffect(() => {
         if (id) {
-            loadActivity(id).then(a => setActivity(a));
+            loadActivity(id).then(activity => setActivity(new ActivityFormValues(activity)));
         } else {
             setLoadingInitial(false)
         }
@@ -53,7 +45,7 @@ const ActivityForm: FC = () => {
     if (loadingInitial)
         return <LoadingComponent content="Loading..." />
 
-    const handleFormSubmit = async (activity: Activity) => {
+    const handleFormSubmit = async (activity: ActivityFormValues) => {
 
         if (!activity.id) {
             const newActivity = {
@@ -84,7 +76,7 @@ const ActivityForm: FC = () => {
                         <Header content="Location Details" sub color="teal"/>
                         <MyTextInput placeholder="City" name="city" />
                         <MyTextInput placeholder="Venue" name="venue" />
-                        <Button disabled={isSubmitting || !dirty || !isValid} loading={loading} floated="right" positive type="submit" content="Submit" />
+                        <Button disabled={isSubmitting || !dirty || !isValid} loading={isSubmitting} floated="right" positive type="submit" content="Submit" />
                         <Button as={Link} to="/activities" floated="right" type="button" content="Cancel" />
                     </Form>
                 )}
