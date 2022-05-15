@@ -41,10 +41,10 @@ export default class UserStore {
     }
 
     getUser = async () => {
-        try{
+        try {
             const user = await agent.Account.current();
             this.setUser(user);
-        }catch(error){
+        } catch (error) {
             console.log(error);
         }
     }
@@ -58,6 +58,12 @@ export default class UserStore {
             store.modalStore.closeModal();
         } catch (error) {
             throw error;
+        }
+    }
+
+    setImage = (image: string) => {
+        if (this.user) {
+            this.user.image = image;
         }
     }
 
