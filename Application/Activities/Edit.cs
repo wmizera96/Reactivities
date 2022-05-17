@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Core;
 using AutoMapper;
 using FluentValidation;
@@ -38,9 +34,7 @@ namespace Application.Activities
             {
                 this._mapper = mapper;
                 this._context = context;
-
             }
-
 
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
