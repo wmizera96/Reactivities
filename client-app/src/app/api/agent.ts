@@ -97,6 +97,7 @@ const Profiles = {
     },
     setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),
     deletePhoto: (id: string) => requests.delete(`/photos/${id}`),
+    update: (displayName: string, bio: string) => requests.put("/profiles", {displayName, bio})
 }
 
 

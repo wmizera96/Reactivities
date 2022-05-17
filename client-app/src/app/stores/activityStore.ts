@@ -40,9 +40,6 @@ export default class ActivityStore {
     selectedActivity: Activity | undefined = undefined;
     private setSelectedActivity = (value: Activity | undefined) => this.selectedActivity = value;
 
-    editMode = false;
-    private setEditMode = (value: boolean) => this.editMode = value;
-
     loading = false;
     private setLoading = (value: boolean) => this.loading = value;
 
@@ -179,4 +176,6 @@ export default class ActivityStore {
             this.setLoading(false)
         }
     }
+
+    clearSelectedActivity = () => this.selectedActivity = undefined;
 }

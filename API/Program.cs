@@ -1,5 +1,6 @@
 using API.Extensions;
 using API.Middleware;
+using API.SignalR;
 using Application.Activities;
 using Application.Core;
 using FluentValidation.AspNetCore;
@@ -62,10 +63,13 @@ if (app.Environment.IsDevelopment())
 app.UseCors("CorsPolicy");
 
 
-// the following 2 must be in this order!!!
+// Use Authentication and useAuthorization must be in this order
 app.UseAuthentication();
+app.UseRouting();
 app.UseAuthorization();
-
-app.MapControllers();
+app.UseEndpoints(endpoints => {
+    endpoints.MapControllers();
+    endpoints.MapHub<ChatHub>("/chat");
+});
 
 await app.RunAsync();

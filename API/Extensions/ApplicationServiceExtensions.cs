@@ -1,3 +1,4 @@
+using Application.Activities;
 using Application.Core;
 using Application.Interfaces;
 using Infrastructure.Photos;
@@ -26,6 +27,7 @@ namespace API.Extensions
                     policy
                         .AllowAnyMethod()
                         .AllowAnyHeader()
+                        .AllowCredentials() // for signalR
                         .WithOrigins("http://localhost:3000");
                 });
             });
@@ -37,6 +39,8 @@ namespace API.Extensions
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
 
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+
+            services.AddSignalR();
             return services;
         }
     }
