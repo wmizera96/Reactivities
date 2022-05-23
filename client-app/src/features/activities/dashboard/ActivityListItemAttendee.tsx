@@ -11,6 +11,12 @@ interface Props {
 
 
 const ActivityListItemAttendee: FC<Props> = ({ attendees }) => {
+    
+    const styles = {
+        borderColor: "orange",
+        borderWidth: "3px"
+    }
+
     return (
         <List horizontal>
             {attendees.map(attendee => (
@@ -19,7 +25,7 @@ const ActivityListItemAttendee: FC<Props> = ({ attendees }) => {
                     key={attendee.username}
                     trigger={
                         <List.Item key={attendee.username} as={Link} to={`/profiles/${attendee.username}`}>
-                            <Image size="mini" circular src={attendee.image || "/assets/user.png"} />
+                            <Image bordered style={attendee.following ? styles : null}  size="mini" circular src={attendee.image || "/assets/user.png"} />
                         </List.Item>
                     }>
                         <Popup.Content>

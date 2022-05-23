@@ -1,5 +1,5 @@
-using Application.Activities;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -8,8 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Activities
 {
-
-
     public class List
     {
         public record Query() : IRequest<Result<List<ActivityDto>>> { }
@@ -19,13 +17,16 @@ namespace Application.Activities
             private readonly DataContext _context;
             private readonly ILogger _logger;
             private readonly IMapper _mapper;
-            public Handler(DataContext context, ILogger<List> logger, IMapper mapper)
+            private readonly IUserAccessor _userAccessor;
+
+            public Handler(DataContext context, ILogger<List> logger, IMapper mapper, IUserAccessor userAccessor)
             {
                 this._mapper = mapper;
+                this._userAccessor = userAccessor;
                 this._context = context;
                 this._logger = logger;
-
             }
+            
             public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 try
@@ -44,7 +45,7 @@ namespace Application.Activities
                 }
 
                 var activities = await this._context.Activities
-                    .ProjectTo<ActivityDto>(this._mapper.ConfigurationProvider)
+                    .ProjectTo<ActivityDto>(this._mapper.ConfigurationProvider, new {currentUserName = this._userAccessor.GetUserName()})
                     .ToListAsync();
 
                 return Result<List<ActivityDto>>.Success(activities);

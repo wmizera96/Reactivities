@@ -12,11 +12,12 @@ const ProfilePage: FC = () => {
 
     const { username } = useParams<{ username: string }>();
 
-    const { loadingProfile, loadProfile, profile } = useStore().profileStore;
+    const { loadingProfile, loadProfile, profile, setActiveTab } = useStore().profileStore;
 
     useEffect(() => {
         loadProfile(username);
-    }, [loadProfile, username])
+        return () => setActiveTab(0);
+    }, [loadProfile, username, setActiveTab])
 
 
     if (loadingProfile) {
