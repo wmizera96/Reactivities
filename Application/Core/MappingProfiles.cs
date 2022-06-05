@@ -22,7 +22,7 @@ namespace Application.Core
                 .ForMember(p => p.Image, o => o.MapFrom(u => u.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url))
                 .ForMember(p => p.FollowersCount, o => o.MapFrom(u => u.AppUser.Followers.Count))
                 .ForMember(p => p.FollowingCount, o => o.MapFrom(u => u.AppUser.Followings.Count))
-                .ForMember(p => p.Following, o => o.MapFrom(s => s.AppUser.Followers.Any(s => s.Observer.UserName == currentUserName)));;
+                .ForMember(p => p.Following, o => o.MapFrom(s => s.AppUser.Followers.Any(s => s.Observer.UserName == currentUserName))); ;
 
             CreateMap<AppUser, Profiles.Profile>()
                 .ForMember(p => p.Image, o => o.MapFrom(u => u.Photos.FirstOrDefault(x => x.IsMain).Url))
@@ -34,6 +34,13 @@ namespace Application.Core
                 .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.Author.DisplayName))
                 .ForMember(d => d.Username, o => o.MapFrom(s => s.Author.UserName))
                 .ForMember(p => p.Image, o => o.MapFrom(u => u.Author.Photos.FirstOrDefault(x => x.IsMain).Url));
+
+            CreateMap<ActivityAttendee, Profiles.UserActivityDto>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Activity.Id))
+                .ForMember(d => d.Date, o => o.MapFrom(s => s.Activity.Date))
+                .ForMember(d => d.Title, o => o.MapFrom(s => s.Activity.Title))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Activity.Category))
+                .ForMember(d => d.HostUsername, o => o.MapFrom(s => s.Activity.Attendees.First(a => a.IsHost).AppUser.UserName));
         }
     }
 }

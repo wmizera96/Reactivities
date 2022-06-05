@@ -1,13 +1,22 @@
 import { format } from "date-fns";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, reaction } from "mobx";
 import { agent } from "../api/agent";
 import { Activity, ActivityFormValues } from "../models/activity";
+import { Pagination, PagingParams } from "../models/pagination";
 import { Profile } from "../models/profile";
 import { store } from "./store";
 
 export default class ActivityStore {
     constructor() {
         makeAutoObservable(this);
+
+        reaction(
+            () => this.predicate.keys(),
+            () => {
+                this.pagingParams = new PagingParams();
+                this.activityRegistry.clear();
+                this.loadActivities();
+            })
     }
 
     activityRegistry = new Map<string, Activity>()
@@ -46,14 +55,60 @@ export default class ActivityStore {
     loadingInitial = false;
     setLoadingInitial = (value: boolean) => this.loadingInitial = value;
 
+    pagination: Pagination | null = null;
+    setPagination = (value: Pagination) => this.pagination = value;
+
+    pagingParams = new PagingParams();
+    setPagingParams = (value: PagingParams) => this.pagingParams = value;
+
+    get axiosParams() {
+        const params = new URLSearchParams();
+        params.append("pageNumber", this.pagingParams.pageNumber.toString())
+        params.append("pageSize", this.pagingParams.pageSize.toString())
+
+        this.predicate.forEach((value, key) => {
+            if(key === "startDate"){
+                params.append(key, (value as Date).toISOString());
+            }else{
+                params.append(key, value);
+            }
+        })
+        return params;
+    }
+
+    predicate = new Map().set("all", true);
+    setPredicate = (predicate: string, value: string|Date) => {
+        const resetPredicate = () => this.predicate.forEach((value, key) => key !== "startDate" && this.predicate.delete(key));
+
+        switch(predicate){    
+            case "all":
+                resetPredicate();
+                this.predicate.set("all", true);
+                break;
+            case "isGoing":
+                resetPredicate();
+                this.predicate.set("isGoing", true);
+                break;
+            case "isHost":
+                resetPredicate();
+                this.predicate.set("isHost", true);
+                break;
+            case "startDate":
+                this.predicate.delete("startDate");
+                this.predicate.set("startDate", value);
+                break;
+        }
+    }
+
     loadActivities = async () => {
         this.setLoadingInitial(true)
         try {
-            const values = await agent.Activities.list()
+            const result = await agent.Activities.list(this.axiosParams)
 
-            values.forEach(a => {
+            result.data.forEach(a => {
                 this.setRegisteredActivity(a);
             });
+            this.setPagination(result.pagination);
             this.setLoadingInitial(false);
 
         } catch (error) {

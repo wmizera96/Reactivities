@@ -3,6 +3,7 @@ import React, { FC } from "react";
 import { Tab } from "semantic-ui-react";
 import { Profile } from "../../app/models/profile";
 import { useStore } from "../../app/stores/store";
+import ProfileActivities from "./ProfileActivities";
 import ProfileFollowings from "./ProfileFollowings";
 import ProfilePhotos from "./ProfilePhotos";
 
@@ -17,7 +18,7 @@ const ProfileContent: FC<Props> = ({ profile }) => {
     const panes = [
         { menuItem: "About", render: () => <Tab.Pane>About Content</Tab.Pane> },
         { menuItem: "Photos", render: () => <ProfilePhotos profile={profile} /> },
-        { menuItem: "Events", render: () => <Tab.Pane>Events Content</Tab.Pane> },
+        { menuItem: "Events", render: () => <ProfileActivities/> },
         { menuItem: "Follwers", render: () => <ProfileFollowings /> },
         { menuItem: "Following", render: () => <ProfileFollowings /> }
     ]

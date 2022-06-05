@@ -1,4 +1,5 @@
 using Application.Activities;
+using Application.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +8,9 @@ namespace API.Controllers
     public class ActivitiesController : BaseApiController
     {
         [HttpGet]
-        public async Task<ActionResult<List<Activity>>> GetActivities(CancellationToken ct)
+        public async Task<ActionResult<List<Activity>>> GetActivities([FromQuery]ActivityParams param, CancellationToken ct)
         {
-            return HandleResult(await this.Mediator.Send(new List.Query(), ct));
+            return HandlePagedResult(await this.Mediator.Send(new List.Query(param), ct));
         }
 
         [HttpGet("{id}")]
